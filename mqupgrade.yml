@@ -1,0 +1,7 @@
+---
+
+- name: Upgrade Jboss MQ
+  hosts: all
+  gather_facts: no
+  roles: 
+    - role: jboss-MQ-upgrade

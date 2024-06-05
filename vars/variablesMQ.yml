@@ -1,0 +1,15 @@
+installataion_bins: D:\installation\
+#jdk_path: D:\Java\openjdk-17.0.10
+#jre_path: D:\Java\jre1.8.0_211
+jboss_install_path: "E:\\node"
+jboss_home: E:\node\jboss-eap-7.4
+#java_home: D:\Java\openjdk-17.0.10
+bind_addr: 0.0.0.0
+installation_src: '\\lgnrisi01-corp-smb\IT Operations\CONFLUENCE\ITOpsSysAdmin-FundsAdmin\Software\RedHat_Jboss7.4\'
+#jboss_inst_ver: "jboss-eap-7.4"
+#java_jdk_path: "D:\\Java"
+#jboss_backup_path: "E:\\backup.zip"
+#java_backup_path: "D:\\Javabackup.zip"
+activemq_inst_ver: "amq-broker-7.11.6" 
+activemq_home: E:\node\amq-broker-7.11.6
+logs_path: "L:\\logs"

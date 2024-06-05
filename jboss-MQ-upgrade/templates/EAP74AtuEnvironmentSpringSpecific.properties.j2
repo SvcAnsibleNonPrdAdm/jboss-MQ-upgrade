@@ -1,0 +1,39 @@
+#################################################################
+###################  Spring Batch Common Config START ###########
+
+## Database connection
+database.jdbcUrl=jdbc:oracle:thin:@{{ DBSERVER }}:11001/{{ ENVNAME }}
+database.username=atu_system
+commonDbConfig.maximumPoolSize=20
+commonDbConfig.minimumIdle=10
+workerDbConfig.maximumPoolSize=20
+workerDbConfig.minimumIdle=10
+masterDbConfig.maximumPoolSize=40
+masterDbConfig.minimumIdle=20
+aaspireJobSubmissionAsyncExecutor.pool-size=25
+aaspireJobSubmissionAsyncExecutor.queue-capacity=50
+
+## Environment Variables 
+#Realm Name (PROD,QA,RV,TST,BAT,BAT2,WEB,DEV)
+EnvGroup={{ REALM }}
+#Cluster Name (ADM/EDI/WEB/JOB)
+cluster={{ CLUSTER }}
+#Environment Set (A1,B2,C3,D4,F6,G7,H8,R,O)
+Envname={{ DATASET }}
+
+## ActiveMq address and port
+##Format for production  ActiveMq.URL=failover:(tcp://machine-name1:61616,tcp://machine-name2:62616)?randomize=false&timeout=3000
+##Format for non-prod  ActiveMq.URL=tcp://machine-name:61616
+#Note for Developers -  use your local Active MQ URL and do not connect to any Active MQ instances of any Non-PROD(TEST)/PROD environments(It can lead to Queue Corruption in respective environments.
+ActiveMq.URL=tcp://{{ ACTIVEMQ_PRIMARY }}:{{ CONNECTOR_PORT }},tcp://{{ ACTIVEMQ_SECONDARY }}:{{ CONNECTOR_PORT }}?randomize=false&timeout=3000
+
+#Isolation Level change required for NON_PROD FORWARD dated environments
+standalone.isolationLevelForCreate=ISOLATION_READ_COMMITTED
+ActiveMq.consumerWindowSize=50
+
+# reverify the below configuration is require or no
+# Time period for message to live in ActiveMq 24h
+defaultJMSMessageTimeToLive=86400000  
+
+prefetchPolicy.queuePrefetch=1
+
