@@ -2,7 +2,7 @@
 
 - name: Include Vars
   ansible.builtin.include_vars:
-    file: vars/variable.yml
+    file: vars/variablesMQ.yml
   tags: 
     - copy_binaries
     - copy_java
@@ -54,6 +54,23 @@
   tags: 
     - copy_binaries
 
+- name: Rename the folder using command module
+  tasks:
+    - name: Rename folder
+      command: mv \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}
+      args:
+        removes: \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker
+  loop: "{{ ENVNAME.split(',') }}"
+  ignore_errors: no
+  tags: 
+    - copy_binaries
+    - copy_rename
+
+- debug: var=ACTIVEMQ_rename
+  tags: 
+    - copy_binaries
+    - copy_rename
+
 - debug: var=ACTIVEMQ_FILECOPY
   tags: 
     - copy_binaries
@@ -80,7 +97,6 @@
   tags: 
     - copy_binaries
 
-
 - name: Copy AtuEnvironmentSpringSpecific.properties template
   win_template:
     src: EAP74AtuEnvironmentSpringSpecific.properties.j2
@@ -93,66 +109,6 @@
   tags: 
     - copy_binaries
     - copy_ATU
-
-
-# - name: Create activemq log directory
-#   when: DC
-#   win_file:
-#     path: 'L:\logs\ActiveMQ\{{ item }}'
-#     state: directory
-#     force: no
-#     remote_src: True
-#   ignore_errors: no
-#   become: yes
-#   become_method: runas
-#   become_user: '{{ aaspiremanage_user }}'
-#   vars:
-#      ansible_become_password: '{{ aaspiremanage_pass }}'
-#   tags: 
-#     - copy_binaries
-
-# - debug: var=log_folder
-#   tags: 
-#     - copy_binaries
-
-- name: Copy activemq files
-  when: DC
-  win_copy:
-    src: "{{ installation_src }}\\{{ activemq_inst_ver }}"
-    dest: "{{ jboss_install_path }}"
-    force: no
-    remote_src: True
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
-  register: ACTIVEMQ_FILECOPY
-  become: yes
-  become_method: runas
-  become_user: '{{ aaspiremanage_user }}'
-  vars:
-     ansible_become_password: '{{ aaspiremanage_pass }}'     
-  tags: 
-    - copy_binaries
-
-- debug: var=ACTIVEMQ_FILECOPY
-  tags: 
-    - copy_binaries
-
-- name: Rename the folder using command module
-  tasks:
-    - name: Rename folder
-      command: mv \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}
-      args:
-        removes: \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
-  tags: 
-    - copy_binaries
-    - copy_rename
-
-- debug: var=ACTIVEMQ_rename
-  tags: 
-    - copy_binaries
-    - copy_rename
 
 - name: Copy activemq artemis-service
   when: DC
