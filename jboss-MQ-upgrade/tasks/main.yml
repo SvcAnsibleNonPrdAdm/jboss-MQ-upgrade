@@ -55,9 +55,9 @@
     - copy_binaries
 
 - name: Rename the folder using command module
-  command: mv \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}
+  command: mv \\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker \\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}
   args:
-    removes: \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker
+    removes: \\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
   tags: 
