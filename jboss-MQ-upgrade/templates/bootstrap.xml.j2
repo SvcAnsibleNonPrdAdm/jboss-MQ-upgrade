@@ -27,7 +27,7 @@
 
    <!-- The web server is only bound to localhost by default -->
    <web path="web" rootRedirectLocation="console">
-       <binding name="artemis" uri="http://0.0.0.0:8161">
+       <binding name="artemis" uri="http://0.0.0.0:{{ Jetty_Port }}">
            <app name="branding" url="redhat-branding" war="redhat-branding.war"/>
            <app name="plugin" url="artemis-plugin" war="artemis-plugin.war"/>
            <app name="console" url="console" war="hawtio.war"/>
