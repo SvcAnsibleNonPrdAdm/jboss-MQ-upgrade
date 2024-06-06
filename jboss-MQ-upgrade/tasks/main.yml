@@ -12,6 +12,7 @@
     - copy_rename
     - copy_broker
     - copy_artemis
+    - copy_restartactivemq
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -25,6 +26,7 @@
     - copy_rename
     - copy_broker
     - copy_artemis
+    - copy_restartactivemq
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -329,11 +331,11 @@
     - copy_binaries
     - copy_installactivemq
 
-- name: Update ActiveMQ service config
-  when: DC
-  win_command: 'sc config "ActiveMQ Artemis {{ ENVNAME }}" start= delayed-start'
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
+#- name: Update ActiveMQ service config
+#  when: DC
+#  win_command: 'sc config "ActiveMQ Artemis {{ ENVNAME }}" start= delayed-start'
+#  loop: "{{ ENVNAME.split(',') }}"
+#  ignore_errors: no
 
 - name: Restart ActiveMQ
   when: DC
@@ -345,7 +347,7 @@
   register: restart_activemq
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_restartactivemq
 
 - debug: var=restart_activemq
   tags: 
