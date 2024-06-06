@@ -10,6 +10,7 @@
     - copy_dfs
     - copy_ATU
     - copy_rename
+    - copy_broker
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -21,6 +22,7 @@
     - copy_dfs
     - copy_ATU
     - copy_rename
+    - copy_broker
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -53,25 +55,62 @@
      ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
-
-- name: Rename the folder using command module
-  command: mv "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker" "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}"
-  args:
-    removes: "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker"
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
-  tags: 
-    - copy_binaries
-    - copy_rename
-
-- debug: var=ACTIVEMQ_rename
-  tags: 
-    - copy_binaries
-    - copy_rename
-
+    
 - debug: var=ACTIVEMQ_FILECOPY
   tags: 
     - copy_binaries
+
+- name: Create broker with item directory
+  win_file:
+    path: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\"
+    state: directory
+  loop: "{{ NODES.split(',') }}"
+  tags: 
+    - copy_binaries
+    - config_dirs
+
+- name: CopyBroker files
+  #when: myfolder.stat.exists
+  win_copy:
+     src: "{{ installation_src }}\\broker"
+     dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\"
+     remote_src: True
+  loop: "{{ NODES.split(',') }}"
+  register: CopyConfigDir
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+     ansible_become_password: '{{ aaspiremanage_pass }}'     
+  tags: 
+    - copy_binaries
+    - config_dirs
+    - copy_configs
+    - copy_broker
+
+- debug: var=CopyConfigDir
+  tags: 
+    - copy_configs
+    - copy_binaries
+    - copy_broker
+
+# - name: Rename the folder using command module
+#   command: mv "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker" "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}"
+#   args:
+#     removes: "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker"
+#   loop: "{{ ENVNAME.split(',') }}"
+#   ignore_errors: no
+#   tags: 
+#     - copy_binaries
+#     - copy_rename
+#- debug: var=ACTIVEMQ_rename
+#  tags: 
+#    - copy_binaries
+#    - copy_rename
+#    - debug: var=ACTIVEMQ_FILECOPY
+#  tags: 
+#    - copy_binaries
+    
 
 - name: Create activemq log directory
   when: DC
