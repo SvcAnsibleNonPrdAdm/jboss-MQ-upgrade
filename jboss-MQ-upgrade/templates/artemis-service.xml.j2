@@ -16,7 +16,7 @@
     limitations under the License.
 
 -->
-{% for var in NODES.split(',')|zip((PORT_BINDING|string).split(','),DFSSERVER.split(','))|list %}
+
 <service>
    <id>ActiveMQ Artemis {{ ENVNAME }}</id>
    <name>ActiveMQ Artemis {{ ENVNAME }}</name>
