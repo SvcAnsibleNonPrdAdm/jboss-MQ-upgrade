@@ -324,14 +324,14 @@
 
 - name: Update ActiveMQ service config
   when: DC
-  win_command: 'sc config "ActiveMQ Artemis: broker {{ item }}" start= delayed-start'
+  win_command: 'sc config "ActiveMQ Artemis {{ item }}" start= delayed-start'
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
 
 - name: Restart ActiveMQ
   when: DC
   win_service:
-     name: 'ActiveMQ Artemis: broker {{ item }}'
+     name: 'ActiveMQ Artemis {{ item }}'
      state: started
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: yes
