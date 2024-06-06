@@ -11,6 +11,7 @@
     - copy_ATU
     - copy_rename
     - copy_broker
+    - copy_artemis
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -23,6 +24,7 @@
     - copy_ATU
     - copy_rename
     - copy_broker
+    - copy_artemis
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -157,14 +159,19 @@
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
   register: copy_artemis_service
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+     ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_artemis
 
 - debug: var=copy_artemis_service
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_artemis
 
 - name: Copy activemq management file
   when: DC
