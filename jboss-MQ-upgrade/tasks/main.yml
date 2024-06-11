@@ -13,6 +13,7 @@
     - copy_broker
     - copy_artemis
     - copy_restartactivemq
+    - copy_activemq_profile
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -27,6 +28,7 @@
     - copy_broker
     - copy_artemis
     - copy_restartactivemq
+    - copy_activemq_profile
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -306,11 +308,24 @@
     - copy_binaries
     - copy_activemq
 
-
-- debug: var=RunCMD
+- name: Copy artemis-profile-cmd
+  when: DC
+  win_template:
+    src: artemis.profile.cmd.j2
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\artemis.profile.cmd"
+    backup: yes
+    force: yes
+  loop: "{{ ENVNAME.split(',') }}"
+  ignore_errors: no
+  register: copy_activemq_profile
   tags: 
     - copy_binaries
-    - copy_RunCMD
+    - copy_activemq_profile
+
+- debug: var=activemq_profile
+  tags: 
+    - copy_binaries
+    - copy_activemq_profile
 
 - name: Run install ActiveMQ to create service
   when: DC
