@@ -289,25 +289,6 @@
 #     - copy_binaries
 #     - copy_RunCMD
 
-- name: Copy activemq log4j2.properties
-  when: DC
-  win_template:
-    src: log4j2.properties.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\log4j2.properties"
-    backup: yes
-    force: yes
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
-  register: copy_activemq_log4j2
-  tags: 
-    - copy_binaries
-    - copy_activemq
-
-- debug: var=copy_activemq_log4j2
-  tags: 
-    - copy_binaries
-    - copy_activemq
-
 - name: Copy artemis-profile-cmd
   when: DC
   win_template:
