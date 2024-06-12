@@ -331,7 +331,7 @@
 
 - name: Update ActiveMQ service config
   when: DC
-  win_command: 'sc config "ActiveMQ Artemis {{ ENVNAME }}" start= delayed-auto'
+  win_command: 'sc config "ActiveMQ Artemis {{ ENVNAME }}" startup= delayed-auto'
     remote_src: True
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
