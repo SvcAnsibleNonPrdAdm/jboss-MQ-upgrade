@@ -45,6 +45,8 @@
      ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
+    - update_activemq
+    - copy_restartactivemq
 
 - name: Copy activemq files
   when: DC
