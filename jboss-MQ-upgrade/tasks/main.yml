@@ -10,6 +10,11 @@
     - copy_dfs
     - copy_ATU
     - copy_rename
+    - copy_broker
+    - copy_artemis
+    - copy_restartactivemq
+    - copy_activemq_profile
+    - update_activemq
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -21,6 +26,11 @@
     - copy_dfs
     - copy_ATU
     - copy_rename
+    - copy_broker
+    - copy_artemis
+    - copy_restartactivemq
+    - copy_activemq_profile
+    - update_activemq
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -35,6 +45,8 @@
      ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
+    - update_activemq
+    - copy_restartactivemq
 
 - name: Copy activemq files
   when: DC
@@ -53,25 +65,62 @@
      ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
-
-- name: Rename the folder using command module
-  command: mv \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}
-  args:
-    removes: \{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker
-  loop: "{{ ENVNAME.split(',') }}"
-  ignore_errors: no
-  tags: 
-    - copy_binaries
-    - copy_rename
-
-- debug: var=ACTIVEMQ_rename
-  tags: 
-    - copy_binaries
-    - copy_rename
-
+    
 - debug: var=ACTIVEMQ_FILECOPY
   tags: 
     - copy_binaries
+
+- name: Create broker with item directory
+  win_file:
+    path: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\"
+    state: directory
+  loop: "{{ NODES.split(',') }}"
+  tags: 
+    - copy_binaries
+    - config_dirs
+
+- name: CopyBroker files
+  #when: myfolder.stat.exists
+  win_copy:
+     src: "{{ installation_src }}\\broker\\"
+     dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\"
+     remote_src: True
+  loop: "{{ NODES.split(',') }}"
+  register: CopyConfigDir
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+     ansible_become_password: '{{ aaspiremanage_pass }}'     
+  tags: 
+    - copy_binaries
+    - config_dirs
+    - copy_configs
+    - copy_broker
+
+- debug: var=CopyConfigDir
+  tags: 
+    - copy_configs
+    - copy_binaries
+    - copy_broker
+
+# - name: Rename the folder using command module
+#   command: mv "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker" "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}"
+#   args:
+#     removes: "\\{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\broker"
+#   loop: "{{ ENVNAME.split(',') }}"
+#   ignore_errors: no
+#   tags: 
+#     - copy_binaries
+#     - copy_rename
+#- debug: var=ACTIVEMQ_rename
+#  tags: 
+#    - copy_binaries
+#    - copy_rename
+#    - debug: var=ACTIVEMQ_FILECOPY
+#  tags: 
+#    - copy_binaries
+    
 
 - name: Create activemq log directory
   when: DC
@@ -112,26 +161,31 @@
   when: DC
   win_template:
     src: artemis-service.xml.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\bin\\artemis-service.xml"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\bin\\artemis-service.xml"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
   register: copy_artemis_service
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+     ansible_become_password: '{{ aaspiremanage_pass }}'     
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_artemis
 
 - debug: var=copy_artemis_service
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_artemis
 
 - name: Copy activemq management file
   when: DC
   win_template:
     src: management.xml.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\management.xml"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\management.xml"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
@@ -150,7 +204,7 @@
   when: DC
   win_template:
     src: broker.xml.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\broker.xml"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\broker.xml"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
@@ -169,7 +223,7 @@
   when: DC
   win_template:
     src: bootstrap.xml.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\bootstrap.xml"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\bootstrap.xml"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
@@ -188,7 +242,7 @@
   when: DC
   win_template:
     src: jolokia-access.xml.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\jolokia-access.xml"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\jolokia-access.xml"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
@@ -207,7 +261,7 @@
   when: DC
   win_template:
     src: log4j2.properties.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\log4j2.properties"
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\log4j2.properties"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
@@ -239,36 +293,30 @@
 #     - copy_binaries
 #     - copy_RunCMD
 
-- name: Copy activemq log4j2.properties
+- name: Copy artemis-profile-cmd
   when: DC
   win_template:
-    src: log4j2.properties.j2
-    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ item }}\\etc\\log4j2.properties"
+    src: artemis.profile.cmd.j2
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\etc\\artemis.profile.cmd"
     backup: yes
     force: yes
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
-  register: copy_activemq_log4j2
+  register: copy_activemq_profile
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_activemq_profile
 
-- debug: var=copy_activemq_log4j2
+- debug: var=activemq_profile
   tags: 
     - copy_binaries
-    - copy_activemq
-
-
-- debug: var=RunCMD
-  tags: 
-    - copy_binaries
-    - copy_RunCMD
+    - copy_activemq_profile
 
 - name: Run install ActiveMQ to create service
   when: DC
   win_command: powershell.exe -
   args:
-    stdin: 'E:\node\amq-broker-7.11.6\apache-artemis-2.28.0.redhat-00019\bin\{{ item }}\bin\artemis-service.exe install'
+    stdin: 'E:\node\amq-broker-7.11.6\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}\bin\artemis-service.exe install'
   register: CreateMQService
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
@@ -285,21 +333,35 @@
 
 - name: Update ActiveMQ service config
   when: DC
-  win_command: 'sc config "ActiveMQ Artemis: broker {{ item }}" start= delayed-start'
+  win_command: 'sc config "ActiveMQ Node {{ ENVNAME }}" start= delayed-auto'
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: no
+  register: update_activemq
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+      ansible_become_password: '{{ aaspiremanage_pass }}'
+  tags: 
+    - copy_binaries
+    - update_activemq
+
+- debug: var=update_activemq
+  tags: 
+    - copy_binaries
+    - update_activemq
 
 - name: Restart ActiveMQ
   when: DC
   win_service:
-     name: 'ActiveMQ Artemis: broker {{ item }}'
+     name: 'ActiveMQ Node {{ ENVNAME }}'
      state: started
   loop: "{{ ENVNAME.split(',') }}"
   ignore_errors: yes
   register: restart_activemq
   tags: 
     - copy_binaries
-    - copy_activemq
+    - copy_restartactivemq
 
 - debug: var=restart_activemq
   tags: 

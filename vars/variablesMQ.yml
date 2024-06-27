@@ -13,3 +13,4 @@ installation_src: '\\lgnrisi01-corp-smb\IT Operations\CONFLUENCE\ITOpsSysAdmin-F
 activemq_inst_ver: "amq-broker-7.11.6" 
 activemq_home: E:\node\amq-broker-7.11.6
 logs_path: "L:\\logs"
+activemq_broker: E:/node/amq-broker-7.11.6
