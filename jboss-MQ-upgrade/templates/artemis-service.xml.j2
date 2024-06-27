@@ -20,10 +20,7 @@
 <service>
    <id>ActiveMQ Node {{ ENVNAME }}</id>
    <name>ActiveMQ Node {{ ENVNAME }}</name>
-   <!--<id>ActiveMQ Artemis {{ ENVNAME }}</id>
-   <name>ActiveMQ Artemis {{ ENVNAME }}</name>-->
    <description>Apache ActiveMQ Artemis is a reliable messaging broker</description>
-
   <env name="ARTEMIS_HOME" value="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019"/>
    <env name="ARTEMIS_INSTANCE" value="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}"/>
    <env name="ARTEMIS_INSTANCE_ETC" value="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}\etc"/>
