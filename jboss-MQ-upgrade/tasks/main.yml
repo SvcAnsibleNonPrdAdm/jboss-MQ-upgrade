@@ -15,6 +15,7 @@
     - copy_restartactivemq
     - copy_activemq_profile
     - update_activemq
+    - copy_artemis_cmd
 
 - name: vault variables
   ansible.builtin.include_vars:
@@ -31,6 +32,7 @@
     - copy_restartactivemq
     - copy_activemq_profile
     - update_activemq
+    - copy_artemis_cmd
 
 - name: Enable Long Paths on Windows Server
   ansible.windows.win_regedit:
@@ -180,6 +182,30 @@
   tags: 
     - copy_binaries
     - copy_artemis
+
+- name: Copy artemis-cmd
+  when: DC
+  win_template:
+    src: artemis.cmd.j2
+    dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\bin\\artemis.cmd"
+    backup: yes
+    force: yes
+  loop: "{{ ENVNAME.split(',') }}"
+  ignore_errors: no
+  register: copy_artemis_cmd
+  become: yes
+  become_method: runas
+  become_user: '{{ aaspiremanage_user }}'
+  vars:
+     ansible_become_password: '{{ aaspiremanage_pass }}'     
+  tags: 
+    - copy_binaries
+    - copy_artemis_cmd
+
+- debug: var=copy_artemis_cmd
+  tags: 
+    - copy_binaries
+    - copy_artemis_cmd
 
 - name: Copy activemq management file
   when: DC
