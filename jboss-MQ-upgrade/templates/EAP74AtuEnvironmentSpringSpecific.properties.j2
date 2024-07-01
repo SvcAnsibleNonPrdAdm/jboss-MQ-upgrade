@@ -2,7 +2,9 @@
 ###################  Spring Batch Common Config START ###########
 
 ## Database connection
+{% for var in ENVNAME.split(',')|zip(DBSERVER.split(',')|list %}
 database.jdbcUrl=jdbc:oracle:thin:@{{ DBSERVER }}:11001/{{ ENVNAME }}
+{end 
 database.username=atu_system
 commonDbConfig.maximumPoolSize=20
 commonDbConfig.minimumIdle=10
