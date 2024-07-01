@@ -76,7 +76,7 @@
   win_file:
     path: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\"
     state: directory
-  loop: "{{ NODES.split(',') }}"
+  loop: "{{ ENVNAME.split(',') }}"
   tags: 
     - copy_binaries
     - config_dirs
@@ -87,7 +87,7 @@
      src: "{{ installation_src }}\\broker\\"
      dest: "{{ activemq_home }}\\apache-artemis-2.28.0.redhat-00019\\bin\\{{ ENVNAME }}\\"
      remote_src: True
-  loop: "{{ NODES.split(',') }}"
+  loop: "{{ ENVNAME.split(',') }}"
   register: CopyConfigDir
   become: yes
   become_method: runas
