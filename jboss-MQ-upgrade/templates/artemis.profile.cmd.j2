@@ -17,17 +17,17 @@ rem specific language governing permissions and limitations
 rem under the License.
 
 set ARTEMIS_HOME="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019"
-set ARTEMIS_INSTANCE="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}"
-set ARTEMIS_DATA_DIR="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}\data"
-set ARTEMIS_ETC_DIR="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}\etc"
+set ARTEMIS_INSTANCE="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ item }}"
+set ARTEMIS_DATA_DIR="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ item }}\data"
+set ARTEMIS_ETC_DIR="{{ activemq_home }}\apache-artemis-2.28.0.redhat-00019\bin\{{ item }}\etc"
 set ARTEMIS_OOME_DUMP="L:\Logs\ActiveMQ\{{ ENVNAME }}\oom_dump.hprof"
 
 
 rem The logging config will need an URI
 rem this will be encoded in case you use spaces or special characters
 rem on your directory structure
-set ARTEMIS_INSTANCE_URI="file:{{ activemq_broker }}/apache-artemis-2.28.0.redhat-00019/bin/{{ ENVNAME }}/"
-set ARTEMIS_INSTANCE_ETC_URI="file:{{ activemq_broker }}/apache-artemis-2.28.0.redhat-00019/bin/{{ ENVNAME }}/etc/"
+set ARTEMIS_INSTANCE_URI="file:{{ activemq_broker }}/apache-artemis-2.28.0.redhat-00019/bin/{{ item }}/"
+set ARTEMIS_INSTANCE_ETC_URI="file:{{ activemq_broker }}/apache-artemis-2.28.0.redhat-00019/bin/{{ item }}/etc/"
 
 rem Cluster Properties: Used to pass arguments to ActiveMQ Artemis which can be referenced in broker.xml
 rem set ARTEMIS_CLUSTER_PROPS=-Dactivemq.remoting.default.port=61617 -Dactivemq.remoting.amqp.port=5673 -Dactivemq.remoting.stomp.port=61614 -Dactivemq.remoting.hornetq.port=5446
