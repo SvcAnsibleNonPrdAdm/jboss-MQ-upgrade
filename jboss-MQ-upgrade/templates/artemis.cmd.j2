@@ -45,7 +45,7 @@ echo.
 :RUN_JAVA
 
 rem "Load Profile Config"
-set ARTEMIS_INSTANCE_ETC="E:\node74\amq-broker-7.11.6\apache-artemis-2.28.0.redhat-00019\bin\{{ ENVNAME }}\etc"
+set ARTEMIS_INSTANCE_ETC="E:\node74\amq-broker-7.11.6\apache-artemis-2.28.0.redhat-00019\bin\{{ item }}\etc"
 call %ARTEMIS_INSTANCE_ETC%\artemis.profile.cmd %*
 
 if not exist %ARTEMIS_OOME_DUMP% goto NO_ARTEMIS_OOME_DUMP
